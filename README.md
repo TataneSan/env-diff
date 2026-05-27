@@ -1,39 +1,15 @@
 # env-diff
 
-Compare two `.env` files and see exactly what changed.
+Compare two .env files and show the differences between them.
 
-```
-$ env-diff .env.staging .env.production
+## Features
 
-  Comparing: .env.staging  →  .env.production
-  ────────────────────────────────────────────────────────
-  1 keys in .env.staging (removed)
-  1 keys in .env.production (added)
-  3 keys changed
-  2 keys unchanged
-  ────────────────────────────────────────────────────────
-
-  REMOVED (only in first file)
-    - DEBUG = true
-
-  ADDED (only in second file)
-    + CACHE_TTL = 3600
-
-  CHANGED
-    ~ DB_HOST
-      - localhost
-      + production-db.example.com
-    ~ DB_NAME
-      - myapp
-      + myapp_prod
-    ~ SECRET_KEY
-      - abc123
-      + xyz789
-
-  UNCHANGED (2 keys)
-     DB_PORT = 5432
-     DB_USER = admin
-```
+- Compare any two .env files side by side
+- Shows added, removed, modified, and unchanged keys
+- Handles quoted values (single and double quotes)
+- Ignores comments and empty lines
+- Sorted output for easy reading
+- Single binary, no dependencies
 
 ## Install
 
@@ -47,80 +23,52 @@ Or build from source:
 git clone https://github.com/TataneSan/env-diff.git
 cd env-diff
 go build -o env-diff .
+cp env-diff /usr/local/bin/
 ```
 
 ## Usage
 
+```
+env-diff <file1> <file2>
+```
+
+### Examples
+
+Compare production and staging:
 ```bash
-# Compare two env files
-env-diff .env.staging .env.production
-
-# Quiet mode — only show differences (hide unchanged)
-env-diff -q .env.staging .env.production
-
-# JSON output (pipe-friendly)
-env-diff -f json .env.staging .env.production
-
-# JSON + quiet
-env-diff -f json -q .env.staging .env.production
+env-diff .env.production .env.staging
 ```
 
-## Flags
-
-| Flag | Shorthand | Default | Description |
-|------|-----------|---------|-------------|
-| `--format` | `-f` | `table` | Output format: `table` or `json` |
-| `--quiet` | `-q` | `false` | Only show differences, hide unchanged keys |
-
-## JSON Output
-
+Check what's missing compared to the example:
 ```bash
-$ env-diff -f json .env.dev .env.prod
+env-diff .env.example .env
 ```
 
-```json
-{
-  "changed": {
-    "DB_HOST": {
-      "old": "localhost",
-      "new": "production-db.example.com"
-    }
-  },
-  "first_file": ".env.dev",
-  "only_in_first": {
-    "DEBUG": "true"
-  },
-  "only_in_second": {
-    "CACHE_TTL": "3600"
-  },
-  "second_file": ".env.prod",
-  "summary": {
-    "added": 1,
-    "changed": 1,
-    "removed": 1,
-    "unchanged": 1
-  },
-  "unchanged": {
-    "DB_PORT": "5432"
-  }
-}
+## Output
+
+```
+  Comparing: .env.production vs .env.staging
+  Total keys: 8 | Added: 1 | Removed: 0 | Modified: 2 | Unchanged: 5
+
+  ~ API_KEY
+    .env.production: prod-secret-key
+    .env.staging: staging-secret-key
+  ~ DB_HOST
+    .env.production: db.prod.example.com
+    .env.staging: db.staging.example.com
+  + DEBUG_MODE
+    .env.staging: true
 ```
 
-## Features
+### Legend
 
-- Colorized terminal output with symbols: `-` removed, `+` added, `~` changed
-- JSON output for scripting and CI pipelines
-- Handles quoted values (`"value"` and `'value'`)
-- Skips comments (`#`) and blank lines
-- Sorted output for deterministic comparison
-- Quiet mode (`-q`) to focus only on differences
-- Respects `NO_COLOR` environment variable
+- `+` Key added (present in file2, not in file1)
+- `-` Key removed (present in file1, not in file2)
+- `~` Key modified (different values)
 
-## Docker
+## Requirements
 
-```bash
-docker run --rm -v $(pwd):/data ghcr.io/tatanesan/env-diff:latest /data/.env.dev /data/.env.prod
-```
+- Go 1.21+
 
 ## License
 
