@@ -1,13 +1,6 @@
-# Binaries
-env-diff
-env-diff.exe
-
-# OS
-.DS_Store
-Thumbs.db
-
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
+__pycache__/
+*.egg-info
+build/
+dist/
+.venv/
+*.pyc
